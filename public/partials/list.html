@@ -1,0 +1,10 @@
+<ul class="table-view">
+    <li class="table-view-cell" ng-repeat="t in transactions">
+        <a href="#/detail/{{t.id}}" class="navigate-right" data-transition="slide-in">
+            <div class="media-body">
+            {{t.note}}
+            <p>[{{t.time | date}}] {{t.amount}}원</p>
+            </div>
+        </a>
+    </li>
+</ul>

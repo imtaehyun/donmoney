@@ -1,0 +1,24 @@
+<form class="input-group">
+    <input type="hidden" id="id" name="id" ng-model="t.id" />
+    <input type="hidden" name="type" ng-model="t.type" />
+    <input type="hidden" name="method" ng-model="t.method" />
+    <input type="hidden" name="vendor" ng-model="t.vendor" />
+    <input type="hidden" name="time" ng-model="t.time" />
+                                                    
+    <div class="input-row">
+        <label>사용내역</label>
+        <input type="text" placeholder="note" ng-model="t.note" />
+    </div>
+    <div class="input-row">
+        <label>금액</label>
+        <input type="text" placeholder="amount" ng-model="t.amount" />
+    </div>
+    <button id="btnEdit" class="btn" ng-click="editTransaction()">
+        <span class="icon icon-edit"></span>
+        Edit
+    </button>
+    <button id="btnDelete" class="btn btn-negative" ng-click="deleteTransaction()">
+        <span class="icon icon-trash"></span>
+        Delete
+    </button>
+</form>
