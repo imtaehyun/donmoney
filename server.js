@@ -3,7 +3,7 @@
 'use strict';
 
 // set up
-require('newrelic');
+//require('newrelic');
 var express     = require('express');
 var logger      = require('morgan');
 var bodyParser  = require('body-parser');
@@ -18,8 +18,8 @@ app.use(bodyParser());
 var connection = mysql.createConnection('mysql://root:mi15chael8.@nezz.pe.kr:3306/dailycost?zeroDateTimeBehavior=convertToNull');
 
 // listen
-app.listen(80);
-console.log("App listening on port 3000");
+app.listen(3000);
+console.log("App listening on port 80");
 
 // routes
 app.get('/api/list', function (req, res) {
@@ -49,9 +49,12 @@ app.post('/api/delete/:id', function (req, res) {
 
 // application
 app.get('/expense', function (req, res) {
-    console.log(req.params.sms);
-    AnalysisService.textAnalyze(req.params.sms, function (result) {
+    console.log('expense sms : ' + JSON.stringify(req.query.sms));
+    AnalysisService.textAnalyze(req.query.sms, function (result) {
         console.log(JSON.stringify(result));
+        addTransaction(result, function(data) {
+            console.log(data);
+        });
     });
 });
 
@@ -66,8 +69,8 @@ function Transaction () {
     this.method = '20'; //10: cash, 20: card
     this.vendor = '';
     this.amount = 0;
-    this.time = Date.now();
-    this.reg_dts = Date.now();
+    this.time = moment().format();
+    this.reg_dts = moment().format();
 }
 
 // services
@@ -82,33 +85,33 @@ var AnalysisService = {
         }
         
         var t = new Transaction();
-        if (text.indexOf('삼성카드')) {
+        if (text.indexOf('삼성카드') > -1) {
             t.method = '20';
             t.vendor = 'samsung';
             t.type = '20';
             try {
-                t.time = moment(splitText[1], 'MM/DD HH:mm');
+                t.time = moment(splitText[1], 'MM/DD HH:mm').format();
             } catch (e) {
-                t.time = Date.now();
+                t.time = moment().format();
             }
-            t.amount = splitText[2].replaceAll('[^0-9]', '');
+            t.amount = splitText[2].replace(/[^0-9]/gi, '');
             t.note = splitText[4];
-        } else if (text.indexOf('씨티카드')) {
+        } else if (text.indexOf('씨티카드') > -1) {
             t.method = '20';
             t.vendor = 'citi';
             t.type = '20';
             try {
-                t.time = moment(splitText[2], 'MM/DD HH:mm');
+                t.time = moment(splitText[2], 'MM/DD HH:mm').format();
             } catch (e) {
-                t.time = Date.now();
+                t.time = moment().format();
             }
-            t.amount = splitText[3].replaceAll('[^0-9]', '');
+            t.amount = splitText[3].replace(/[^0-9]/gi, '');
             t.note = splitText[5];
         } else {
             t.method = '10';
-            t.amount = text.replaceAll('[^0-9]', '');
-            t.note = text.replaceAll('[0-9]', '');
-            t.time = Date.now();
+            t.amount = text.replace(/[^0-9]/gi, '');
+            t.note = text.replace(/[0-9]/gi, '');
+            t.time = moment().format();
         }
         callback(t);
     }    
@@ -148,9 +151,11 @@ var updateTransaction = function(transaction, callback) {
 };
 
 var addTransaction = function(transaction, callback) {
-    var sql = 'INSERT INTO TRANSACTIONS(type, method, vendor, note, amount, time, reg_dts) VALUES(?,?,?,?,?,?,?)';
-    connection.query(sql, [transaction.type, transaction.method, transaction.vendor, transaction.note, transaction.amount, transaction.time, transaction.req_dts], function(err, result) {
+    var sql = 'INSERT INTO TRANSACTIONS(type, method, vendor, note, amount, time, reg_dts) VALUES(?, ?, ?, ?, ?, ?, ?)';
+    console.log('addTransaction : ' + JSON.stringify(transaction));
+    var query = connection.query(sql, [transaction.type, transaction.method, transaction.vendor, transaction.note, transaction.amount, transaction.time, transaction.req_dts], function(err, result) {
         if (err) callback(err);
         callback(result.affectedRows);
     });
+    console.log(query.sql);
 };
