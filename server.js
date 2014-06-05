@@ -3,7 +3,7 @@
 'use strict';
 
 // set up
-//require('newrelic');
+require('newrelic');
 var express     = require('express');
 var logger      = require('morgan');
 var bodyParser  = require('body-parser');
@@ -18,7 +18,7 @@ app.use(bodyParser());
 var connection = mysql.createConnection('mysql://root:mi15chael8.@nezz.pe.kr:3306/dailycost?zeroDateTimeBehavior=convertToNull');
 
 // listen
-app.listen(3000);
+app.listen(80);
 console.log("App listening on port 80");
 
 // routes
@@ -49,14 +49,59 @@ app.post('/api/delete/:id', function (req, res) {
 
 // application
 app.get('/expense', function (req, res) {
-    console.log('expense sms : ' + JSON.stringify(req.query.sms));
-    AnalysisService.textAnalyze(req.query.sms, function (result) {
-        console.log(JSON.stringify(result));
-        addTransaction(result, function(data) {
-            console.log(data);
+
+    if (req.query.sms !== undefined) {
+        AnalysisService.textAnalyze(req.query.sms, function (analyzedData) {
+            console.log(JSON.stringify(analyzedData));
+            addTransaction(analyzedData, function(result) {
+                if (result > 0) res.redirect('/#/detail/' + result);
+                else {
+                    console.log(result);
+                    res.send('err');
+                }
+            });
         });
-    });
+    } else {
+        var t = new Transaction();
+        t.type = '20';
+        t.method = '10';
+        t.amount = req.query.amount;
+        t.note = req.query.note;
+        try {
+            t.time = moment(req.query.time, 'YYYY/MM/DD HH:mm:ss').format();
+        } catch (e) {
+            t.time = moment().format();
+        }
+        addTransaction(t, function(result) {
+            if (result > 0) res.redirect('/#/detail/' + result);
+            else {
+                console.log(result);
+                res.send('err');
+            }
+        });
+    }
+
 });
+
+app.get('/income', function (req, res) {
+    var t = new Transaction();
+    t.type = '10';
+    t.method = '10';
+    t.amount = req.query.amount;
+    t.note = req.query.note;
+    try {
+        t.time = moment(req.query.time, 'YYYY/MM/DD HH:mm:ss').format();
+    } catch (e) {
+        t.time = moment().format();
+    }
+    addTransaction(t, function(result) {
+        if (result > 0) res.redirect('/#/detail/' + result);
+        else {
+            console.log(result);
+            res.send('err');
+        }
+    });
+})
 
 app.get('*', function(req, res) {
    res.sendfile('./public/index.html');
@@ -70,7 +115,6 @@ function Transaction () {
     this.vendor = '';
     this.amount = 0;
     this.time = moment().format();
-    this.reg_dts = moment().format();
 }
 
 // services
@@ -120,42 +164,46 @@ var AnalysisService = {
 // db functions
 var listTransaction = function(callback) {
     var sql = 'SELECT * FROM TRANSACTIONS ORDER BY time DESC';
-    connection.query(sql, function(err, rows) {
+    var query = connection.query(sql, function(err, rows) {
         if (err) callback(err);
         callback(rows);
     });
+    console.log(query.sql);
 };
 
 var getTransaction = function(id, callback) {
     var sql = 'SELECT * FROM TRANSACTIONS WHERE id = ?';
-    connection.query(sql, [id], function(err, rows) {
+    var query = connection.query(sql, [id], function(err, rows) {
         if (err) callback(err);
         callback(rows[0]);
     });
+    console.log(query.sql);
 };
 
 var delTransaction = function(id, callback) {
     var sql = 'DELETE FROM TRANSACTIONS WHERE id = ?';
-    connection.query(sql, [id], function(err, result) {
+    var query = connection.query(sql, [id], function(err, result) {
         if (err) callback(err);
         callback(result.affectedRows);
     });
+    console.log(query.sql);
 };
 
 var updateTransaction = function(transaction, callback) {
     var sql = 'UPDATE TRANSACTIONS SET type = ?, method = ?, vendor = ?, note = ?, amount = ? WHERE id = ?';
-    connection.query(sql, [transaction.type, transaction.method, transaction.vendor, transaction.note, transaction.amount, transaction.id], function(err, result) {
+    var query = connection.query(sql, [transaction.type, transaction.method, transaction.vendor, transaction.note, transaction.amount, transaction.id], function(err, result) {
         if (err) callback(err);
         callback(result.affectedRows);
     });
+    console.log(query.sql);
 };
 
 var addTransaction = function(transaction, callback) {
-    var sql = 'INSERT INTO TRANSACTIONS(type, method, vendor, note, amount, time, reg_dts) VALUES(?, ?, ?, ?, ?, ?, ?)';
-    console.log('addTransaction : ' + JSON.stringify(transaction));
-    var query = connection.query(sql, [transaction.type, transaction.method, transaction.vendor, transaction.note, transaction.amount, transaction.time, transaction.req_dts], function(err, result) {
+    var sql = 'INSERT INTO TRANSACTIONS(type, method, vendor, note, amount, time) VALUES(?, ?, ?, ?, ?, ?)';
+//    console.log('addTransaction : ' + JSON.stringify(transaction));
+    var query = connection.query(sql, [transaction.type, transaction.method, transaction.vendor, transaction.note, transaction.amount, transaction.time], function(err, result) {
         if (err) callback(err);
-        callback(result.affectedRows);
+        callback(result.insertId);
     });
     console.log(query.sql);
 };
