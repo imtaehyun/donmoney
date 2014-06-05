@@ -20,7 +20,7 @@ app.config(['$routeProvider', '$httpProvider', function($routeProvider, $httpPro
 app.controller('ListController', ['$http', '$scope', function($http, $scope) {
     $scope.transactions = [];
 
-    $http.get('/list').success(function(data) {
+    $http.get('/api/list').success(function(data) {
         $scope.transactions = data;
     });
 }]);
@@ -28,12 +28,12 @@ app.controller('ListController', ['$http', '$scope', function($http, $scope) {
 app.controller('DetailController', function($http, $scope, $routeParams, $location) {
     $scope.t = {};
 
-    $http.get('/get/' + $routeParams.id).success(function(data) {
+    $http.get('/api/get/' + $routeParams.id).success(function(data) {
         $scope.t = data;
     });
 
     $scope.editTransaction = function() {
-        $http.post('/modify', $scope.t)
+        $http.post('/api/modify', $scope.t)
             .success(function(result) {
                 if (result === '1') $location.path('/');
                 else alert('수정 중 오류가 발생했습니다.');
@@ -41,7 +41,7 @@ app.controller('DetailController', function($http, $scope, $routeParams, $locati
     };
 
     $scope.deleteTransaction = function() {
-        $http.post('/delete/' + $scope.t.id)
+        $http.post('/api/delete/' + $scope.t.id)
             .success(function(result) {
                 if (result === '1') $location.path('/');
                 else alert('삭제하지 못했습니다.');
