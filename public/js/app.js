@@ -13,8 +13,8 @@ app.config(['$routeProvider', '$httpProvider', function($routeProvider, $httpPro
         otherwise({
             redirectTo: '/'
         });
-    $httpProvider.defaults.useXDomain = true;
-    delete $httpProvider.defaults.headers.common['X-Requested-With'];
+//    $httpProvider.defaults.useXDomain = true;
+//    delete $httpProvider.defaults.headers.common['X-Requested-With'];
 }]);
 
 app.controller('ListController', ['$http', '$scope', function($http, $scope) {

@@ -1,10 +1,16 @@
-<ul class="table-view">
-    <li class="table-view-cell" ng-repeat="t in transactions">
-        <a href="#/detail/{{t.id}}" class="navigate-right" data-transition="slide-in">
-            <div class="media-body">
-            {{t.note}}
-            <p>[{{t.time | date}}] {{t.amount}}원</p>
-            </div>
-        </a>
-    </li>
-</ul>
+<header class="bar bar-nav">
+    <h1 class="title">Don Money</h1>
+</header>
+<div class="content">
+    <ul class="table-view">
+        <li class="table-view-cell" ng-repeat="t in transactions">
+            <a href="#/detail/{{t.id}}" class="navigate-right" data-transition="slide-in">
+                <div class="media-body">
+                    {{t.note}}
+                    <p>[{{t.time | date}}] <span ng-class="(t.type === '10') ? 'income' : 'expense'">{{t.amount}}</span>원</p>
+                </div>
+            </a>
+        </li>
+    </ul>
+</div>
+
