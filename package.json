@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "forever start -o ./log/output.log server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,6 +14,8 @@
     "express": "^4.4.1",
     "moment": "^2.6.0",
     "morgan": "^1.1.1",
-    "mysql": "^2.3.2"
+    "mysql": "^2.3.2",
+    "cron": "^1.0.4",
+    "shelljs": "^0.3.0"
   }
 }

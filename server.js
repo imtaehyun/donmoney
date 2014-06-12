@@ -10,6 +10,8 @@ var bodyParser  = require('body-parser');
 var app         = express();
 var mysql       = require('mysql');
 var moment      = require('moment');
+var CronJob     = require('cron').CronJob;
+var shell       = require('shelljs');
 
 // configuration
 app.use(express.static(__dirname + '/public'));
@@ -207,3 +209,14 @@ var addTransaction = function(transaction, callback) {
     });
     console.log(query.sql);
 };
+
+new CronJob('00 00 01 * * *', function () {
+    var time = moment().format('YYYYMMDD_HHmmss');
+    shell.exec('mysqldump --user="root" --password="mi15chael8." dailycost TRANSACTIONS > /root/donmoney-web/backup/db/db_' + time + '.sql', function (code, output) {
+        if (code == 0) {
+            console.log('db_' + time + '.sql');
+        } else {
+            console.log('db backup err: ', output);
+        }
+    });
+});
