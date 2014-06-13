@@ -7,7 +7,7 @@
             <a href="#/detail/{{t.id}}" class="navigate-right" data-transition="slide-in">
                 <div class="media-body">
                     {{t.note}}
-                    <p>[{{t.time | date}}] <span ng-class="(t.type === '10') ? 'income' : 'expense'">{{t.amount}}</span>원</p>
+                    <p>[{{t.time | date:'yyyy.MM.dd'}}] <span ng-class="(t.type === '10') ? 'income' : 'expense'">{{t.amount}}</span>원</p>
                 </div>
             </a>
         </li>
