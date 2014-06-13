@@ -210,7 +210,7 @@ var addTransaction = function(transaction, callback) {
     console.log(query.sql);
 };
 
-new CronJob('00 00 01 * * *', function () {
+new CronJob('00 00 00 * * *', function () {
     var time = moment().format('YYYYMMDD_HHmmss');
     shell.exec('mysqldump --user="root" --password="mi15chael8." dailycost TRANSACTIONS > /root/donmoney-web/backup/db/db_' + time + '.sql', function (code, output) {
         if (code == 0) {
@@ -219,4 +219,4 @@ new CronJob('00 00 01 * * *', function () {
             console.log('db backup err: ', output);
         }
     });
-});
+}, null, true, 'Asia/Seoul');
