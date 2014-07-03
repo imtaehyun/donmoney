@@ -3,7 +3,10 @@
 'use strict';
 
 // set up
-if (process.env.NODE_ENV === 'production') require('newrelic');
+if (process.env.NODE_ENV === 'production') {
+    require('newrelic');
+    console.log('Server Monitering is started');
+}
 var express     = require('express');
 var logger      = require('morgan');
 var bodyParser  = require('body-parser');
@@ -25,8 +28,6 @@ app.set('port', process.env.PORT || 3000)
 http.createServer(app).listen(app.get('port'), function() {
     console.log('Server listening on port ' + app.get('port'));
 });
-
-app.use('/', router);
 
 // application
 app.get('/expense', function (req, res) {
@@ -82,7 +83,9 @@ app.get('/income', function (req, res) {
             res.send('err');
         }
     });
-})
+});
+
+app.use('/', router);
 
 //  model
 function Transaction () {

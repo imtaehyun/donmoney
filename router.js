@@ -2,10 +2,13 @@ var express = require('express');
 var router = express.Router();
 var db = require('./database');
 
+/*
 router.use(function(req, res, next) {
     console.log('%s %s %s', req.method, req.url, req.path);
     next();
 });
+*/
+
 router.route('/transactions')
     .get(function(req, res, next) {
         db.selectTransactions(function (result) {
