@@ -2,16 +2,19 @@ var express = require('express');
 var router = express.Router();
 var db = require('./database');
 
-/*
-router.use(function(req, res, next) {
-    console.log('%s %s %s', req.method, req.url, req.path);
-    next();
-});
-*/
+router.route('/')
+    .all(function(req, res, next) {
+        res.sendfile('./public/index.html');
+    });
 
 router.route('/transactions')
     .get(function(req, res, next) {
         db.selectTransactions(function (result) {
+            res.json(result);
+        });
+    })
+    .post(function(req, res, next) {
+        db.insertTransaction(req,body, function(result) {
             res.json(result);
         });
     })
@@ -28,10 +31,6 @@ router.route('/transactions/:id')
             res.json(result);
         });
     })
-//    .post(function(req, res, next) {
-//        // INSERT
-//        res.send(200);
-//    })
     .delete(function(req, res, next) {
         db.deleteTransaction(req.params.id, function (result) {
             res.json(result);
@@ -40,7 +39,7 @@ router.route('/transactions/:id')
 
 router.route('*')
     .get(function(req, res, next) {
-        res.sendfile('./public/index.html');
+        res.sendfile('./public/404.html');
     });
 
 module.exports = router;
