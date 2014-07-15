@@ -115,23 +115,23 @@ var AnalysisService = {
             t.vendor = 'samsung';
             t.type = '20';
             try {
-                t.time = moment(splitText[1], 'MM/DD HH:mm').format();
-            } catch (e) {
-                t.time = moment().format();
-            }
-            t.amount = splitText[2].replace(/[^0-9]/gi, '');
-            t.note = splitText[4];
-        } else if (text.indexOf('씨티카드') > -1) {
-            t.method = '20';
-            t.vendor = 'citi';
-            t.type = '20';
-            try {
                 t.time = moment(splitText[2], 'MM/DD HH:mm').format();
             } catch (e) {
                 t.time = moment().format();
             }
             t.amount = splitText[3].replace(/[^0-9]/gi, '');
             t.note = splitText[5];
+        } else if (text.indexOf('씨티카드') > -1) {
+            t.method = '20';
+            t.vendor = 'citi';
+            t.type = '20';
+            try {
+                t.time = moment(splitText[3], 'MM/DD HH:mm').format();
+            } catch (e) {
+                t.time = moment().format();
+            }
+            t.amount = splitText[4].replace(/[^0-9]/gi, '');
+            t.note = splitText[6];
         } else {
             t.method = '10';
             t.amount = text.replace(/[^0-9]/gi, '');

@@ -39,6 +39,7 @@ router.route('/transactions/:id')
 
 router.route('*')
     .get(function(req, res, next) {
+        res.status(404);
         res.sendfile('./public/404.html');
     });
 
