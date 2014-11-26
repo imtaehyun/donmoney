@@ -3,7 +3,7 @@
 var mysql = require('mysql');
 
 module.exports = {
-    connection: mysql.createConnection(process.env.DB_URL),
+    connection: mysql.createConnection(process.env.CLEARDB_DATABASE_URL),
     selectTransactions: function(callback) {
         var sql = 'SELECT * FROM TRANSACTIONS ORDER BY time DESC';
         var query = this.connection.query(sql, function(err, rows) {

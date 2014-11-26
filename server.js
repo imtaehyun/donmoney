@@ -1,12 +1,7 @@
-/*jslint node: true*/
 // server.js
 'use strict';
 
 // set up
-if (process.env.NODE_ENV === 'production') {
-    require('newrelic');
-    console.log('Server Monitering is started');
-}
 var express     = require('express');
 var logger      = require('morgan');
 var bodyParser  = require('body-parser');
@@ -15,8 +10,6 @@ var http        = require('http');
 var router      = require('./router');
 var db          = require('./database');
 var moment      = require('moment');
-var CronJob     = require('cron').CronJob;
-var shell       = require('shelljs');
 
 // configuration
 app.use(express.static(__dirname + '/public'));
@@ -141,14 +134,3 @@ var AnalysisService = {
         callback(t);
     }    
 };
-
-new CronJob('00 00 00 * * *', function () {
-    var time = moment().format('YYYYMMDD_HHmmss');
-    shell.exec('mysqldump --user="root" --password="mi15chael8." dailycost TRANSACTIONS > /root/donmoney-web/backup/db/db_' + time + '.sql', function (code, output) {
-        if (code == 0) {
-            console.log('db_' + time + '.sql');
-        } else {
-            console.log('db backup err: ', output);
-        }
-    });
-}, null, true, 'Asia/Seoul');
