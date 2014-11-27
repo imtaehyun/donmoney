@@ -3,7 +3,30 @@
 var mysql = require('mysql');
 
 module.exports = {
-    connection: mysql.createConnection(process.env.CLEARDB_DATABASE_URL),
+    connection: null,
+    handleConnection: function(callback) {
+        this.connection = mysql.createConnection(process.env.CLEARDB_DATABASE_URL);
+
+        this.connection.connect(function(err) {
+            if (err) {
+                console.error('error when connecting to db:', err);
+                return err;
+            }
+            console.log('db connects success');
+            callback();
+        });
+
+        this.connection.on('error', function(err) {
+            console.log('db error', err);
+
+            if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+                this.handleConnection();
+            } else {
+                console.error('db error code', err.code);
+                throw err;
+            }
+        });
+    },
     selectTransactions: function(callback) {
         var sql = 'SELECT * FROM TRANSACTIONS ORDER BY time DESC';
         var query = this.connection.query(sql, function(err, rows) {

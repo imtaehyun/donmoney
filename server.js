@@ -15,11 +15,18 @@ var moment      = require('moment');
 app.use(express.static(__dirname + '/public'));
 app.use(logger());
 app.use(bodyParser());
-app.set('port', process.env.PORT || 3000)
+app.set('port', process.env.PORT || 3000);
 
 // listen
-http.createServer(app).listen(app.get('port'), function() {
-    console.log('Server listening on port ' + app.get('port'));
+db.handleConnection(function(err) {
+    if (err) {
+        console.error('db connection error:', err);
+        throw err;
+    }
+
+    http.createServer(app).listen(app.get('port'), function() {
+        console.log('Server listening on port ' + app.get('port'));
+    });
 });
 
 // application
