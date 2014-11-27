@@ -5,6 +5,7 @@ var mysql = require('mysql');
 module.exports = {
     connection: null,
     handleConnection: function(callback) {
+        var self = this;
         this.connection = mysql.createConnection(process.env.CLEARDB_DATABASE_URL);
 
         this.connection.connect(function(err) {
@@ -20,7 +21,7 @@ module.exports = {
             console.log('db error', err);
 
             if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-                this.handleConnection();
+                self.handleConnection();
             } else {
                 console.error('db error code', err.code);
                 throw err;
