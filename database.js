@@ -21,7 +21,12 @@ module.exports = {
             console.log('db error', err);
 
             if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-                self.handleConnection();
+                self.handleConnection(function(err) {
+                    if (err) {
+                        console.error('db connection error:', err);
+                        throw err;
+                    }
+                });
             } else {
                 console.error('db error code', err.code);
                 throw err;
